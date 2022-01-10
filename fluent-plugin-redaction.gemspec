@@ -2,14 +2,14 @@
 $:.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.name = "fluent-plugin-redaction"
+  gem.name = "yo-fluent-plugin-redaction"
   gem.description = "Fluentd redaction filter plugin for anonymize specific strings in text data."
   gem.license = "MIT"
-  gem.homepage = "https://github.com/oleewere/fluent-plugin-redaction"
+  gem.homepage = "https://github.com/Yobota/fluent-plugin-redaction"
   gem.summary = gem.description
   gem.version = File.read("VERSION").strip
-  gem.authors = ["Oliver Szabo"]
-  gem.email = ["oleewere@gmail.com"]
+  gem.authors = ["Oliver Szabo", "Yobota"]
+  gem.email = ["hello@yobota.com"]
   #gem.platform    = Gem::Platform::RUBY
   gem.files = `git ls-files`.split("\n")
   gem.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
