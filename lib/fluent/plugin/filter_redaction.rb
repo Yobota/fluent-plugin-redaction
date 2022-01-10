@@ -12,7 +12,7 @@ module Fluent
                 config_param :value, :string, default: nil
                 config_param :pattern, :regexp, default: nil
                 config_param :replace, :string, default: "[REDACTED]"
-                config_param :start_from_position, :integer, default: 0
+                config_param :ignore_timestamp, :bool, default: false
             end
 
             def initialize
@@ -43,7 +43,7 @@ module Fluent
                     if @pattern_rules_map.key?(c.key)
                         list = @pattern_rules_map[c.key]
                     end
-                    list << [c.value, c.pattern, c.replace, c.start_from_position]
+                    list << [c.value, c.pattern, c.replace, c.ignore_timestamp]
                     @pattern_rules_map[c.key] = list
                 end
             end
@@ -53,14 +53,15 @@ module Fluent
                     record_value = @accessors[key].call(record)
                     if record_value
                         rules.each do | rule |
-                            # Ignore initial characters if need to
-                            #   e.g: timestamp might clash with phone number and credit card
-                            if record_value.size() <= rule[3]
-                                ignored_value = ""
-                                filtered_value = record_value
-                            else
-                                ignored_value = record_value[0..rule[3]]
-                                filtered_value = record_value[rule[3]+1..-1]
+                            ignored_value = ""
+                            filtered_value = record_value
+                            #   Ignore timestamp explicitly
+                            #   Assuming the first square bracket value is the timestamp
+                            #  based on the gunicorn log formatter config
+                            if rule[3] && record_value.start_with?("[")
+                                ts_last_index = record_value.index("]")
+                                ignored_value = record_value[0..ts_last_index]
+                                filtered_value = record_value[ts_last_index+1..-1]
                             end
                             # Redaction process
                             if rule[0]
